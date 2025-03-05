@@ -5,22 +5,23 @@ import cors from 'cors';
 import { json } from 'body-parser';
 import http from 'http';
 import { BaseContext, ContextFunction } from '@apollo/server';
+import {createResolvers} from "./graphql/resolvers";
+import {typeDefs} from "./graphql/schema";
 
 
+// // Define your GraphQL schema
+// const typeDefs = `#graphql
+//   type Query {
+//     hello: String
+//   }
+// `;
 
-// Define your GraphQL schema
-const typeDefs = `#graphql
-  type Query {
-    hello: String
-  }
-`;
-
-// Define your resolvers
-const resolvers = {
-    Query: {
-        hello: () => 'Hello world!'
-    }
-};
+// // Define your resolvers
+// const resolvers = {
+//     Query: {
+//         hello: () => 'Hello world!'
+//     }
+// };
 
 // Context interface
 interface MyContext extends BaseContext {
@@ -33,7 +34,7 @@ async function startServer() {
 
     const server = new ApolloServer<MyContext>({
         typeDefs,
-        resolvers,
+        resolvers: createResolvers(process.env.INFURA_PROJECT_ID as string),
     });
 
     // Start the Apollo Server

@@ -9,12 +9,12 @@ const AAVE_POOL_ABI= [
 ]
 
 export class BlockchainHelper {
-    private provider: ethers.providers.JsonRpcProvider;
+    private provider: ethers.JsonRpcProvider;
     private aavePoolContract: ethers.Contract;
 
     constructor(INFURA_PROJECT_ID: string) {
         const providerUrl = `https://${process.env.ETHEREUM_NETWORK}.infura.io/v3/${process.env.INFURA_PROJECT_ID}`;
-        this.provider = new ethers.providers.JsonRpcProvider(providerUrl);
+        this.provider = new ethers.JsonRpcProvider(providerUrl);
 
         this.aavePoolContract = new ethers.Contract(
             process.env.AAVE_V3_POOL_ADDRESS as string,

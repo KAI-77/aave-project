@@ -19,5 +19,5 @@ export const typeDefs = `#graphql
     }
     
     type Query {
-    getAavePositions(walletAddress: String!): AavePositions }
+    getAavePositions(walletAddress: String!): AavePosition }
 `;
