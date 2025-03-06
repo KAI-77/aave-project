@@ -3,67 +3,38 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import cors from 'cors';
 import { json } from 'body-parser';
-import http from 'http';
-import { BaseContext, ContextFunction } from '@apollo/server';
-import {createResolvers} from "./graphql/resolvers";
-import {typeDefs} from "./graphql/schema";
+import { createResolvers } from "./graphql/resolvers";
+import { typeDefs } from "./graphql/schema";
 
-
-// // Define your GraphQL schema
-// const typeDefs = `#graphql
-//   type Query {
-//     hello: String
-//   }
-// `;
-
-// // Define your resolvers
-// const resolvers = {
-//     Query: {
-//         hello: () => 'Hello world!'
-//     }
-// };
-
-// Context interface
-interface MyContext extends BaseContext {
-    token?: string;
-}
-
+// Start the server
 async function startServer() {
     const app = express();
-    const httpServer = http.createServer(app);
 
-    const server = new ApolloServer<MyContext>({
-        typeDefs,
-        resolvers: createResolvers(process.env.INFURA_PROJECT_ID as string),
+    // Initialize Apollo Server with schema and resolvers
+    const server = new ApolloServer({
+        typeDefs, // GraphQL schema
+        resolvers: createResolvers(process.env.INFURA_PROJECT_ID as string), // Resolvers to handle GraphQL queries
     });
 
     // Start the Apollo Server
     await server.start();
 
-    // Correct context function type
-    const contextFunction: ContextFunction<[{req: express.Request, res: express.Response}], MyContext> =
-        async ({ req }) => {
-            return {
-                token: req.headers.authorization as string | undefined
-            };
-        };
-
-    // Apply middleware
+    // Apply middleware for handling GraphQL requests
     app.use(
         '/graphql',
-        cors(),
-        json(),
-        expressMiddleware(server, {
-            context: contextFunction
-        })
+        cors(), // Enable Cross-Origin Resource Sharing (CORS)
+        json(), // Parse incoming requests as JSON
+        expressMiddleware(server)
     );
 
-    // Modified listen method to use httpServer
+    // Start the server on the specified port
     const PORT = process.env.PORT || 4000;
-    await new Promise<void>((resolve) => httpServer.listen({ port: PORT }, resolve));
-    console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
+    app.listen(PORT, () => {
+        console.log(`Server ready at http://localhost:${PORT}/graphql`);
+    });
 }
 
+// Handle server startup errors
 startServer().catch((error) => {
     console.error('Failed to start server:', error);
     process.exit(1);
