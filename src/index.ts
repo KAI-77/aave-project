@@ -5,6 +5,7 @@ import cors from 'cors';
 import { json } from 'body-parser';
 import { createResolvers } from "./graphql/resolvers";
 import { typeDefs } from "./graphql/schema";
+import playground from 'graphql-playground-middleware-express'
 
 // Start the server
 async function startServer() {
@@ -14,7 +15,11 @@ async function startServer() {
     const server = new ApolloServer({
         typeDefs, // GraphQL schema
         resolvers: createResolvers(process.env.INFURA_PROJECT_ID as string), // Resolvers to handle GraphQL queries
+        introspection: true,
+
     });
+
+    app.get("/", playground({ endpoint: "/graphql" }));
 
     // Start the Apollo Server
     await server.start();
