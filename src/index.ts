@@ -19,7 +19,34 @@ async function startServer() {
 
     });
 
-    app.get("/", playground({ endpoint: "/graphql" }));
+    app.get("/", playground({ endpoint: "/graphql", settings: {
+        "editor.reuseHeaders": true,
+        },
+        tabs: [
+            {
+                endpoint: "/graphql",
+                query: `query GetAavePositions($walletAddress: String!) {
+  getAavePositions(walletAddress: $walletAddress) {
+    collateral_positions {
+      asset
+      amount
+    }
+    borrowing_positions {
+      asset
+      amount
+    }
+    available_borrows
+    current_liquidation_threshold
+    ltv
+    health_factor
+  }
+}`,
+                variables: `{
+  "walletAddress": "0xYourWalletAddressHere"
+}`
+            }
+        ]
+    }));
 
     // Start the Apollo Server
     await server.start();
